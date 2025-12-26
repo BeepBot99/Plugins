@@ -11,65 +11,53 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
 import javax.inject.Inject
 
-@Suppress("unused")
-class AndroidLibraryPlugin @Inject constructor(private val javaToolchainService: JavaToolchainService) : Plugin<Project> {
-	override fun apply(project: Project) {
-		with(project) {
-			plugins.apply("com.android.library")
-			plugins.apply("dev.frozenmilk.ftc-libraries")
-		}
+@Suppress("unused", "DEPRECATION")
+class AndroidLibraryPlugin @Inject constructor(
+    private val javaToolchainService: JavaToolchainService,
+) : Plugin<Project> {
+    override fun apply(project: Project) {
+        project.plugins.apply("com.android.library")
+        project.plugins.apply("dev.frozenmilk.ftc-libraries")
 
-		val ftc = project.extensions.getByType(FTC::class.java)
-		ftc.sdk {
-			it.configurationNames = mutableSetOf("compileOnly")
-			it.appcompat
-		}
+        project.extensions.getByType(JavaPluginExtension::class.java).run {
+            toolchain.languageVersion.set(JavaLanguageVersion.of(8))
+        }
 
-		with(project) {
-			extensions.getByType(JavaPluginExtension::class.java).run {
-				toolchain {
-					it.languageVersion.set(JavaLanguageVersion.of(8))
-				}
-			}
+        project.tasks.withType(Test::class.java).configureEach { testTask ->
+            testTask.javaLauncher.set(javaToolchainService.launcherFor {
+                it.languageVersion.set(JavaLanguageVersion.of(21))
+            })
+        }
 
-			dependencies.add("testImplementation", "junit:junit:4.13.2")
-			tasks.withType(Test::class.java).configureEach { testTask ->
-				testTask.javaLauncher.set(javaToolchainService.launcherFor {
-					it.languageVersion.set(JavaLanguageVersion.of(17))
-				})
-			}
-		}
+        val androidComponentsExtension =
+            project.extensions.getByType(AndroidComponentsExtension::class.java)
 
-		val androidComponentsExtension = project.extensions.getByType(AndroidComponentsExtension::class.java)
+        if (androidComponentsExtension !is LibraryAndroidComponentsExtension) error("Library can only be applied to an Android Library")
 
-		if (androidComponentsExtension !is LibraryAndroidComponentsExtension)
-			error("Library can only be applied to an Android Library")
+        androidComponentsExtension.finalizeDsl {
+            it.apply {
+                compileSdk = 30
 
-		androidComponentsExtension.finalizeDsl {
-			it.apply {
-				compileSdk = 30
+                defaultConfig {
+                    minSdk = 24
+                    targetSdk = 28
 
-				defaultConfig {
-					minSdk = 24
-					@Suppress("DEPRECATION")
-					targetSdk = 28
+                    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+                }
 
-					testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-				}
+                compileOptions {
+                    sourceCompatibility = JavaVersion.VERSION_1_8
+                    targetCompatibility = JavaVersion.VERSION_1_8
+                }
 
-				compileOptions {
-					sourceCompatibility = JavaVersion.VERSION_1_8
-					targetCompatibility = JavaVersion.VERSION_1_8
-				}
+                ndkVersion = "21.3.6528147"
 
-				ndkVersion = "21.3.6528147"
-
-				publishing {
-					singleVariant("release") {
-						withSourcesJar()
-					}
-				}
-			}
-		}
-	}
+                publishing {
+                    singleVariant("release") {
+                        withSourcesJar()
+                    }
+                }
+            }
+        }
+    }
 }
