@@ -45,7 +45,7 @@ It is recommended to get this via applying the `TeamCode` plugin below.
 otherwise:
 ```kt
 dependencies {
-    implementation("com.qualcomm.ftcrobotcontroller:FtcRobotController:10.3.0")
+    implementation("com.qualcomm.ftcrobotcontroller:FtcRobotController:11.0.0")
 }
 ```
 
@@ -58,7 +58,7 @@ how to use it.
 
 ```kt
 dependencies {
-    implementation("dev.frozenmilk:EasyAutoLibraries:0.0.0")
+    implementation("dev.frozenmilk:EasyAutoLibraries:1.0.0")
 }
 ```
 
@@ -70,45 +70,124 @@ A plugin that makes it easy to set up FTC related libraries, uses
 
 ```kt
 plugins {
-    id("dev.frozenmilk.ftc-libraries") version "10.3.0-0.1.4"
+    id("dev.frozenmilk.ftc-libraries") version "11.0.0-1.0.0"
 }
 ```
 
 [You can find the latest version here](https://repo.dairy.foundation/#/releases/dev/frozenmilk/FTCLibraries)
 
-Usage:
+Demo Usage:
+
+Note that this is not a recommended gradle file to use. Take a look at the
+templates for that.
 
 ```kt
-// adds this `ftc` block
+// the ftc block contains the ftc libraries dsl
 ftc {
-    sdk {
-        // the sdk block allows you to add dependencies from the FTC SDK
-        RobotServer // adds it at the sdk version
-        FtcCommon("10.1.0") // specifies a different version
-        Blocks("10.1.1", "compileOnly") // varargs specifies different configurations
-        OnBotJava {
-            version = "10.1.0"
-            configurationNames = setOf("compileOnly")
-        }
-        RobotCore {
-            configurationNames += "api"
-        }
-        // you can specify the default version for the whole sdk:
-        version = "10.3.0" // default for this plugin version
-        // and configurationNames
-        configurationNames = setOf("implementation")
-    }
-    // note: the sdk is special, if you access the SDK at all,
-    //  it will automatically add all of the SDK dependencies, but will make
-    //  `Blocks` runtimeOnly. This configuration is good for TeamCode
-    //  repositories
+    // calling the kotlin function will add kotlin to your project
+    kotlin()
 
-    kotlin // adds kotlin to the project
+    // the sdk block contains dependencies related to the sdk
+    sdk {
+        // just like when adding a dependency normally,
+        // we use the configuration
+
+        // this adds RobotCore to implementation
+        implementation(RobotCore)
+        // we can also specify a version
+        implementation(FtcCommon("11.0.0"))
+
+        // the sdk block specifically has a shared version
+        version = "11.0.0"
+        // once you change it,
+        // all un-specified versions for sdk dependencies will have this version
+        // note that changing it won't affect previous actions
+
+        // the sdk block also has a TeamCode function
+        TeamCode()
+        // or:
+        TeamCode("11.0.0")
+        // these functions are recommended for use in team code modules,
+        // as they provide all the dependencies for you, rather than manually
+        // specifying it
+    }
+
+    // the acmerobotics blocks contains roadrunner and dashboard
+    acmerobotics {
+        // the acmerobotics block also contains a road runner block:
+        roadrunner {
+            implementation(core)
+            implementation(ftc)
+            implementation(actions)
+        }
+        // and dashboard
+        implementation(dashboard)
+    }
+
+    // the dairy block contains dairy dependencies
+    dairy {
+        // this adds the sloth library to the runtime,
+        // you'll still need to set up the plugin
+        implementation(Sloth)
+        // slothboard is also available
+        // sloth is mutually exclusive with dashboard,
+        // and gradle will crash with an error telling you
+        // why if you have them both
+        implementation(slothboard)
+
+        // you can also get latest Mercurial 2.0 beta
+        implementation(MercurialFTC)
+    }
+
+    // the next block contains next ftc dependencies
+    next {
+        // core libraries
+        implementation(ftc)
+        implementation(bindings)
+        implementation(control)
+
+        // extensions
+        implementation(pedro)
+        implementation(roadrunner)
+        implementation(fateweaver)
+    }
+
+    // the pedro block contains pedro pathing dependencies
+    pedro {
+        implementation(core)
+        implementation(ftc)
+        implementation(telemetry)
+    }
+
+    // the ftcontrol block contains panels dependencies
+    ftcontrol {
+        // base library
+        implementation(panels)
+
+        // plugins
+        implementation(battery)
+        implementation(camerastream)
+        implementation(capture)
+        implementation(configurables)
+        implementation(field)
+        implementation(gamepad)
+        implementation(graph)
+        implementation(lights)
+        implementation(limelightproxy)
+        implementation(opmodecontrol)
+        implementation(pinger)
+        implementation(telemetry)
+        implementation(themes)
+        implementation(utils)
+
+        // or fullpanels preset
+        implementation(fullpanels)
+    }
 }
 ```
 
-At the moment, this plugin only provides the sdk and kotlin support, but you can
-PR this repo to add other libraries, we're happy for anything.
+If you're interested in adding more libraries, or maintain one of these
+libraries and want to make a PR, please do.
 
 Further usage can be seen at the Templates repo, which shows how to use the
 TeamCode, JVMLibrary and AndroidLibrary plugins.
@@ -117,13 +196,12 @@ TeamCode, JVMLibrary and AndroidLibrary plugins.
 A plugin that sets up FTC teamcode projects using FTCLibraries, allowing teams
 to easily add other libraries to their project
 
-This automatically sets up the android application config, adds the whole sdk,
-and the FtcRobotController module from above. See the templates repository for
-examples.
+This automatically sets up the android application config.
+See the templates repository for examples.
 
 ```kt
 plugins {
-    id("dev.frozenmilk.teamcode") version "10.3.0-0.1.4"
+    id("dev.frozenmilk.teamcode") version "11.0.0-1.0.0"
 }
 ```
 
@@ -138,7 +216,7 @@ See the templates repository for examples.
 
 ```kt
 plugins {
-    id("dev.frozenmilk.android-library") version "10.3.0-0.1.4"
+    id("dev.frozenmilk.android-library") version "11.0.0-1.0.0"
 }
 ```
 
@@ -152,7 +230,7 @@ See the templates repository for examples.
 
 ```kt
 plugins {
-    id("dev.frozenmilk.jvm-library") version "10.3.0-0.1.4"
+    id("dev.frozenmilk.jvm-library") version "11.0.0-1.0.0"
 }
 ```
 
@@ -218,7 +296,7 @@ used to generate a metadata object at compile time.
 
 ```kt
 plugins {
-    id("dev.frozenmilk.build-meta-data") version "0.0.0"
+    id("dev.frozenmilk.build-meta-data") version "0.0.2"
     // for example, to embed git meta data:
     id("dev.frozenmilk.publish") version "0.0.5"
 }
