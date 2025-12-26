@@ -2,12 +2,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-repositories {
-    mavenCentral()
-    google()
-}
-
-version = "10.3.0"
+version = "11.0.0"
 
 plugins {
     //noinspection AndroidGradlePluginVersion
@@ -18,16 +13,15 @@ plugins {
 }
 
 ftc.sdk {
-    configurationNames = mutableSetOf("implementation")
-    FtcCommon
-    RobotCore
-    RobotServer
-    Hardware
-    Vision
-    Inspection
-    Blocks
-    OnBotJava
-    appcompat
+    implementation(FtcCommon)
+    implementation(RobotCore)
+    implementation(RobotServer)
+    implementation(Hardware)
+    implementation(Vision)
+    implementation(Inspection)
+    implementation(Blocks)
+    implementation(OnBotJava)
+    implementation(appcompat)
 }
 
 android {
@@ -36,7 +30,11 @@ android {
         @Suppress("DEPRECATION")
         //noinspection ExpiredTargetSdkVersion
         targetSdk = 28
-        buildConfigField("String", "APP_BUILD_TIME", "\"${SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.ROOT).format(Date())}\"")
+        buildConfigField(
+            "String",
+            "APP_BUILD_TIME",
+            "\"${SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.ROOT).format(Date())}\"",
+        )
     }
 
     buildFeatures {
