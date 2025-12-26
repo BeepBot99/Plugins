@@ -1,79 +1,80 @@
 package dev.frozenmilk.libs
 
-import dev.frozenmilk.easyautolibraries.AbstractEasyAutoLibrary
-import dev.frozenmilk.easyautolibraries.util.VersionProvider
+import dev.frozenmilk.FTC
+import dev.frozenmilk.easyautolibraries.EasyAutoDependency
+import dev.frozenmilk.easyautolibraries.EasyAutoScope
 
-@Suppress("unused", "MemberVisibilityCanBePrivate", "PropertyName")
-open class SDK (
-	override val parent: AbstractEasyAutoLibrary<*>,
-) : AbstractEasyAutoLibrary<SDK>("sdk"), VersionProvider {
-	override var version = "10.3.0"
+@Suppress("unused", "PropertyName", "FunctionName")
+class SDK(ftc: FTC) : EasyAutoScope<SDK>(ftc) {
+    var version = "11.0.0"
 
-	val mavenCentral by getOrRegisterRepository("mavenCentral", { mavenCentral() })
-	val google by getOrRegisterRepository("google", { google() })
+    private val sdkModule = dependency { name ->
+        EasyAutoDependency(
+            group = "org.firstinspires.ftc",
+            artifact = name,
+            defaultVersion = { version },
+        )
+    }
 
-	val FtcCommon by registerDependency(
-		"FtcCommon",
-		{ version -> "org.firstinspires.ftc:FtcCommon:$version" },
-		{ mavenCentral }
-	)
-	val RobotCore by registerDependency(
-		"RobotCore",
-		{ version -> "org.firstinspires.ftc:RobotCore:$version" },
-		{ mavenCentral }
-	)
-	val RobotServer by registerDependency(
-		"RobotServer",
-		{ version -> "org.firstinspires.ftc:RobotServer:$version" },
-		{ mavenCentral }
-	)
-	val Hardware by registerDependency(
-		"Hardware",
-		{ version -> "org.firstinspires.ftc:Hardware:$version" },
-		{ mavenCentral }
-	)
-	val Vision by registerDependency(
-		"Vision",
-		{ version -> "org.firstinspires.ftc:Vision:$version" },
-		{ mavenCentral }
-	)
-	val Inspection by registerDependency(
-		"Inspection",
-		{ version -> "org.firstinspires.ftc:Inspection:$version" },
-		{ mavenCentral }
-	)
-	val Blocks by registerDependency(
-		"Blocks",
-		{ version -> "org.firstinspires.ftc:Blocks:$version" },
-		{ mavenCentral }
-	)
-	val OnBotJava by registerDependency(
-		"OnBotJava",
-		{ version -> "org.firstinspires.ftc:OnBotJava:$version" },
-		{ mavenCentral }
-	)
+    private var androidVersionCodesAndNames = mutableMapOf<String, Pair<Int, String>>()
 
-	val appcompat by registerDependency(
-		"appcompat",
-		{ version -> "androidx.appcompat:appcompat:$version" },
-		{ google }
-	) {
-		it.version = "1.2.0"
-	}
+    init {
+        androidVersionCodesAndNames["10.1.0"] = 56 to "10.1"
+        androidVersionCodesAndNames["10.1.1"] = 57 to "10.1.1"
+        androidVersionCodesAndNames["10.2.0"] = 58 to "10.2"
+        androidVersionCodesAndNames["10.3.0"] = 59 to "10.3"
+        androidVersionCodesAndNames["11.0.0"] = 60 to "11.0"
+    }
 
-	override fun onAccess() {
-		project.afterEvaluate {
-			if (this@SDK.dependencies.none { it.accessed }) {
-				// apply all
-				this@SDK.dependencies.forEach {
-					// we don't want teams to accidentally import that blocks opmode companion
-					if (it.name == "Blocks" && it.configurationNames.contains("implementation")) {
-						it.configurationNames -= "implementation"
-						it.configurationNames += "runtimeOnly"
-					}
-					it()
-				}
-			}
-		}
-	}
+    fun androidVersionCodeAndName(version: String, code: Int, name: String) {
+        androidVersionCodesAndNames[version] = code to name
+    }
+
+    fun androidVersionCodeAndName(version: String) =
+        requireNotNull(androidVersionCodesAndNames[version]) {
+            "cannot produce version code and name for $version"
+        }
+
+    val FtcRobotController by dependency {
+        EasyAutoDependency(
+            group = "com.qualcomm.ftcrobotcontroller",
+            artifact = "FtcRobotController",
+            defaultVersion = { version },
+        )
+    }
+
+    val FtcCommon by sdkModule
+    val RobotCore by sdkModule
+    val RobotServer by sdkModule
+    val Hardware by sdkModule
+    val Vision by sdkModule
+    val Inspection by sdkModule
+    val Blocks by sdkModule
+    val OnBotJava by sdkModule
+
+    val appcompat by dependency {
+        EasyAutoDependency(
+            group = "androidx.appcompat",
+            artifact = "appcompat",
+            version = "1.2.0",
+        )
+    }
+
+    fun TeamCode() {
+        runtimeOnly(FtcRobotController)
+        implementation(FtcCommon)
+        implementation(RobotCore)
+        implementation(RobotServer)
+        implementation(Hardware)
+        implementation(Vision)
+        implementation(Inspection)
+        runtimeOnly(Blocks)
+        implementation(OnBotJava)
+        implementation(appcompat)
+    }
+
+    fun TeamCode(version: String) {
+        this.version = version
+        TeamCode()
+    }
 }
