@@ -62,6 +62,38 @@ class Dairy(ftc: FTC) : EasyAutoScope<Dairy>(ftc) {
         }
     }
 
+    val ftControl = FtControl(ftc) { version, name ->
+        EasyAutoDependency(
+            group = "com.bylazar.sloth",
+            artifact = name,
+            defaultVersion = { "$slothVersion+$version" },
+        ) {
+            fun incompatibleWithFtControl(dependency: EasyAutoDependency) {
+                incompatibleWith(
+                    dependency = dependency,
+                    reason = "sloth versions of panels libraries are incompatible with non-sloth versions",
+                )
+            }
+            incompatibleWithFtControl(ftc.ftControl.panels)
+            incompatibleWithFtControl(ftc.ftControl.battery)
+            incompatibleWithFtControl(ftc.ftControl.camerastream)
+            incompatibleWithFtControl(ftc.ftControl.capture)
+            incompatibleWithFtControl(ftc.ftControl.configurables)
+            incompatibleWithFtControl(ftc.ftControl.field)
+            incompatibleWithFtControl(ftc.ftControl.gamepad)
+            incompatibleWithFtControl(ftc.ftControl.graph)
+            incompatibleWithFtControl(ftc.ftControl.lights)
+            incompatibleWithFtControl(ftc.ftControl.limelightproxy)
+            incompatibleWithFtControl(ftc.ftControl.opmodecontrol)
+            incompatibleWithFtControl(ftc.ftControl.pinger)
+            incompatibleWithFtControl(ftc.ftControl.telemetry)
+            incompatibleWithFtControl(ftc.ftControl.themes)
+            incompatibleWithFtControl(ftc.ftControl.utils)
+            incompatibleWithFtControl(ftc.ftControl.fullpanels)
+
+        }
+    }
+
     //
     // Mercurial
     //

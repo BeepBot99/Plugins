@@ -5,14 +5,19 @@ import dev.frozenmilk.easyautolibraries.EasyAutoDependency
 import dev.frozenmilk.easyautolibraries.EasyAutoScope
 
 @Suppress("unused")
-class FtControl(ftc: FTC) : EasyAutoScope<FtControl>(ftc) {
-    private fun plugin(version: String) = dependency { name ->
+class FtControl(
+    ftc: FTC,
+    private val makePlugin: (version: String, name: String) -> EasyAutoDependency,
+) : EasyAutoScope<FtControl>(ftc) {
+    constructor(ftc: FTC) : this(ftc, { version, name ->
         EasyAutoDependency(
             group = "com.bylazar",
             artifact = name,
             version = version,
         )
-    }
+    })
+
+    private fun plugin(version: String) = dependency { name -> makePlugin(version, name) }
 
     val panels by plugin("1.0.5")
 

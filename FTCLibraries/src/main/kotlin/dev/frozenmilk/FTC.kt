@@ -43,12 +43,13 @@ class FTC(project: Project) : EasyAutoScopeRoot<FTC>(project, LogLevel.LIFECYCLE
 
     val acmerobotics = ACMERobotics(this)
 
+    val ftControl = FtControl(this)
+
     // note: needs to come after acmerobotics' dashboard
+    // note: needs to come after ftControl
     val dairy = Dairy(this)
 
     val next = Next(this)
-
-    val ftControl = FtControl(this)
 
     val pedro = Pedro(this)
 }
