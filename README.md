@@ -58,7 +58,7 @@ how to use it.
 
 ```kt
 dependencies {
-    implementation("dev.frozenmilk:EasyAutoLibraries:1.0.0")
+    implementation("dev.frozenmilk:EasyAutoLibraries:1.1.1")
 }
 ```
 
@@ -70,7 +70,7 @@ A plugin that makes it easy to set up FTC related libraries, uses
 
 ```kt
 plugins {
-    id("dev.frozenmilk.ftc-libraries") version "11.0.0-1.0.0"
+    id("dev.frozenmilk.ftc-libraries") version "11.0.0-1.1.0"
 }
 ```
 
@@ -129,11 +129,22 @@ ftc {
         // this adds the sloth library to the runtime,
         // you'll still need to set up the plugin
         implementation(Sloth)
+
         // slothboard is also available
-        // sloth is mutually exclusive with dashboard,
+        // slothboard is mutually exclusive with dashboard,
         // and gradle will crash with an error telling you
         // why if you have them both
         implementation(slothboard)
+
+        // the sloth versions of panels are also available
+        // these versions are mutually exclusive with the non-sloth versions,
+        // and gradle will crash with an error telling you
+        // why if you have them both
+        // see below for all the ftcontrol libraries
+        // the sloth version has all the same options
+        ftControl {
+            implementation(fullpanels)
+        }
 
         // you can also get latest Mercurial 2.0 beta
         implementation(MercurialFTC)
@@ -160,7 +171,7 @@ ftc {
     }
 
     // the ftcontrol block contains panels dependencies
-    ftcontrol {
+    ftControl {
         // base library
         implementation(panels)
 
@@ -201,7 +212,7 @@ See the templates repository for examples.
 
 ```kt
 plugins {
-    id("dev.frozenmilk.teamcode") version "11.0.0-1.0.0"
+    id("dev.frozenmilk.teamcode") version "11.0.0-1.1.0"
 }
 ```
 
@@ -216,7 +227,7 @@ See the templates repository for examples.
 
 ```kt
 plugins {
-    id("dev.frozenmilk.android-library") version "11.0.0-1.0.0"
+    id("dev.frozenmilk.android-library") version "11.0.0-1.1.0"
 }
 ```
 
@@ -230,7 +241,7 @@ See the templates repository for examples.
 
 ```kt
 plugins {
-    id("dev.frozenmilk.jvm-library") version "11.0.0-1.0.0"
+    id("dev.frozenmilk.jvm-library") version "11.0.0-1.1.0"
 }
 ```
 
