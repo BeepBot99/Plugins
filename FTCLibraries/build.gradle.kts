@@ -31,7 +31,7 @@ dependencies {
     //noinspection GradleDependency
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.24")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21")
-    api("dev.frozenmilk:EasyAutoLibraries:1.0.0")
+    api("dev.frozenmilk:EasyAutoLibraries:1.1.1")
 }
 
 dairyPublishing {

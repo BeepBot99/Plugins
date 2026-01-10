@@ -14,7 +14,7 @@ class ACMERobotics(ftc: FTC) : EasyAutoScope<ACMERobotics>(ftc) {
                 version = version,
             ) {
                 // we don't want to get dashboard with it
-                excludeGroup("com.acmerobotics.dashboard")
+                exclude(group = "com.acmerobotics.dashboard")
             }
         }
 
