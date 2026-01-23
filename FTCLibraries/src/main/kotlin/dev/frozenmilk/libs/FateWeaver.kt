@@ -6,14 +6,16 @@ import dev.frozenmilk.easyautolibraries.EasyAutoScope
 
 @Suppress("unused")
 class FateWeaver(ftc: FTC) : EasyAutoScope<FateWeaver>(ftc)  {
-    private fun dependency(version: String) = dependency { name ->
+    var version = "0.3.3"
+
+    private val dependency = dependency { name ->
         EasyAutoDependency(
             group = "gay.zharel.fateweaver",
             artifact = name,
-            version = version
+            defaultVersion = { version }
         )
     }
 
-    val core by dependency("0.3.3")
-    val ftc by dependency("0.3.3")
+    val core by dependency
+    val ftc by dependency
 }

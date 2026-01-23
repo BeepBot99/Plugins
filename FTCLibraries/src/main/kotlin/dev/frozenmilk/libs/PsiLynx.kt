@@ -6,14 +6,17 @@ import dev.frozenmilk.easyautolibraries.EasyAutoScope
 
 @Suppress("unused")
 class PsiLynx(ftc: FTC) : EasyAutoScope<PsiLynx>(ftc) {
-    private fun psikit(version: String) = dependency { name ->
+
+    var version = "0.1.0-beta2"
+
+    private val psikit = dependency { name ->
         EasyAutoDependency(
             group = "org.psilynx.psikit",
             artifact = name,
-            version = version
+            defaultVersion = { version }
         )
     }
 
-    val core by psikit("0.1.0-beta2")
-    val ftc by psikit("0.1.0-beta2")
+    val core by psikit
+    val ftc by psikit
 }
